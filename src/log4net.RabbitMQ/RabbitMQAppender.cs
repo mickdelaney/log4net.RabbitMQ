@@ -199,10 +199,16 @@ namespace log4net.RabbitMQ
 			string ex = loggingEvent.GetExceptionString();
 
 			var sb = new StringBuilder(loggingEvent.RenderedMessage, 
-				loggingEvent.RenderedMessage.Length + (ex != null ? ex.Length : 0));
+				loggingEvent.RenderedMessage.Length
+				+ (ex == null 
+					? 0 
+					: ex.Length + Environment.NewLine.Length));
 
 			if (ex != null)
+			{
+				sb.Append(Environment.NewLine);
 				sb.Append(ex);
+			}
 
 			return _Encoding.GetBytes(sb.ToString());
 		}
