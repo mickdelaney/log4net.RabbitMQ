@@ -15,6 +15,8 @@ Appender properties:
  * **HostName** - the host name of the computer/node to connect to. Defaults to `localhost`.
  * **Exchange** - what exchange to publish log messages to. Defaults to `log4net-logging` and is declared when the appender is started.
 
+For SSL -- have a look at: http://www.rabbitmq.com/ssl.html
+
 ## Example log4net.config
 
 This configuration demonstrates usage of the properties from above:
