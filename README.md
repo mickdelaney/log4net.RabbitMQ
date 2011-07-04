@@ -14,6 +14,8 @@ Appender properties:
  * **Protocol** - of type IProtocol - what protocol to use for RabbitMQ-communication. See also `SetProtocol`.
  * **HostName** - the host name of the computer/node to connect to. Defaults to `localhost`.
  * **Exchange** - what exchange to publish log messages to. Defaults to `log4net-logging` and is declared when the appender is started.
+ * **AppId** - the name of the publishing application
+ * **ExtendedData** - whether to include the class, file and the line of the log message as headers in `IBasicProperties`.
 
 For SSL -- have a look at: http://www.rabbitmq.com/ssl.html
 
