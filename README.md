@@ -1,5 +1,7 @@
 # log4net RabbitMQ Appender
 
+**Nuget key: `log4net.RabbitMQAppender`**
+
 An appender for log4net. Configure it like this:
 
 ```xml
