@@ -10,7 +10,7 @@ Appender properties:
  * **UserName** - the username to authenticate with.
  * **Password** - the password to authenticate with.
  * **Port** - what port the RabbitMQ broker is listening to.
- * **Topic** - what topic to publish with.
+ * **Topic** - what topic to publish with. It must contain a string: `{0}`, or the logger won't work. The string inserted here will be used together with `string.Format`.
  * **Protocol** - of type IProtocol - what protocol to use for RabbitMQ-communication. See also `SetProtocol`.
  * **HostName** - the host name of the computer/node to connect to.
  * **Exchange** - what exchange to publish log messages to.
