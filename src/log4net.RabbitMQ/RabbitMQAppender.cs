@@ -169,6 +169,9 @@ namespace log4net.RabbitMQ
 			basicProperties.Timestamp = new AmqpTimestamp(
 				Convert.ToInt64((loggingEvent.TimeStamp - _Epoch).TotalSeconds));
 
+			// support Validated User-ID (see http://www.rabbitmq.com/extensions.html)
+			basicProperties.UserId = UserName;
+
 			var message = GetMessage(loggingEvent);
 			_Model.BasicPublish(_Exchange,
 			                    string.Format(_Topic, loggingEvent.Level.Name),
