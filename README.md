@@ -15,7 +15,10 @@ Appender properties:
  * **HostName** - the host name of the computer/node to connect to.
  * **Exchange** - what exchange to publish log messages to.
 
-*Example log4net.config:*
+## Example log4net.config
+
+This configuration demonstrates usage of the properties from above:
+
 ```xml
 <log4net>
 	<appender name="AmqpAppender" type="log4net.RabbitMQ.RabbitMQAppender, log4net.RabbitMQ">
@@ -31,16 +34,18 @@ Appender properties:
 </log4net>
 ```
 
-In
+You would register log4net in a web application as such, in `Application_Start`:
 
-## Note
+```csharp
+using log4net.Config;
+// ...
+XmlConfigurator.ConfigureAndWatch(new FileInfo(Server.MapPath("~/log4net.config")));
+```
 
-If using it in an ASP.Net application, remember to run
+In `Application_End`:
 
 ```csharp
 LogManager.Shutdown();
 ```
 
-at `Application_End()`.
-
-See `samples\log4net.RabbitMQ.Web` for a complete example.
+If you put the log4net configuration in web.config, reloading and restarting the AMQP channel won't work after an AppDomain recycle or change to the web.config file.
