@@ -13,7 +13,7 @@ Appender properties:
  * **Topic** - what topic to publish with. It must contain a string: `{0}`, or the logger won't work. The string inserted here will be used together with `string.Format`.
  * **Protocol** - of type IProtocol - what protocol to use for RabbitMQ-communication. See also `SetProtocol`.
  * **HostName** - the host name of the computer/node to connect to.
- * **Exchange** - what exchange to publish log messages to.
+ * **Exchange** - what exchange to publish log messages to. Defaults to `log4net-logging` and is declared when the appender is started.
 
 ## Example log4net.config
 
