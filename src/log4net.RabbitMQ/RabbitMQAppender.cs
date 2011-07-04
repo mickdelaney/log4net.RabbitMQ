@@ -148,6 +148,23 @@ namespace log4net.RabbitMQ
 			set { if (value != null) _Exchange = value; }
 		}
 
+		private string _AppId;
+		/// <summary>
+		/// Gets or sets the application id to specify when sending. Defaults to null,
+		/// and then IBasicProperties.AppId will be the name of the logger instead.
+		/// </summary>
+		public string AppId
+		{
+			get { return _AppId; }
+			set { _AppId = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets whether the logger should log extended data.
+		/// Defaults to false.
+		/// </summary>
+		public bool ExtendedData { get; set; }
+
 		#endregion
 
 		protected override void Append(LoggingEvent loggingEvent)
@@ -162,22 +179,39 @@ namespace log4net.RabbitMQ
 				ErrorHandler.Error("Could not start connection", e);
 			}
 
+			var basicProperties = GetBasicProperties(loggingEvent);
+			var message = GetMessage(loggingEvent);
+
+			_Model.BasicPublish(_Exchange,
+			                    string.Format(_Topic, loggingEvent.Level.Name),
+			                    true, false, basicProperties,
+			                    message);
+		}
+
+		private IBasicProperties GetBasicProperties(LoggingEvent loggingEvent)
+		{
 			var basicProperties = _Model.CreateBasicProperties();
 			basicProperties.ContentEncoding = "utf8";
 			basicProperties.ContentType = "text/plain";
-			basicProperties.AppId = loggingEvent.Domain;
+			basicProperties.AppId = AppId ?? loggingEvent.LoggerName;
+
 			basicProperties.Timestamp = new AmqpTimestamp(
 				Convert.ToInt64((loggingEvent.TimeStamp - _Epoch).TotalSeconds));
 
 			// support Validated User-ID (see http://www.rabbitmq.com/extensions.html)
 			basicProperties.UserId = UserName;
 
-			var message = GetMessage(loggingEvent);
-			_Model.BasicPublish(_Exchange,
-			                    string.Format(_Topic, loggingEvent.Level.Name),
-			                    true, false, basicProperties,
-			                    message);
+			if (ExtendedData)
+			{
+				basicProperties.Headers["ClassName"] = loggingEvent.LocationInformation.ClassName;
+				basicProperties.Headers["FileName"] = loggingEvent.LocationInformation.FileName;
+				basicProperties.Headers["MethodName"] = loggingEvent.LocationInformation.MethodName;
+				basicProperties.Headers["LineNumber"] = loggingEvent.LocationInformation.LineNumber;
+			}
+
+			return basicProperties;
 		}
+
 
 		private byte[] GetMessage(LoggingEvent loggingEvent)
 		{

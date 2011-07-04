@@ -27,6 +27,7 @@ This configuration demonstrates usage of the properties from above:
 <log4net>
 	<appender name="AmqpAppender" type="log4net.RabbitMQ.RabbitMQAppender, log4net.RabbitMQ">
 		<topic value="samples.web.{0}" />
+		<appId value="My Web Application" />
 		<layout type="log4net.Layout.PatternLayout">
 				<conversionPattern value="%date [%thread] %-5level - %message%newline" />
 		</layout>
@@ -96,6 +97,13 @@ It should be noted that the message's IBasicProperties' following properties are
  * **ContentType** - to "text/plain"
  * **AppId** - to `loggingEvent.Domain`
  * **Timestamp** - to `new AmqpTimestamp(Convert.ToInt64((loggingEvent.TimeStamp - _Epoch).TotalSeconds))` where _Epoch is 1/1/1970 at 00:00. Hence, it's the unix timestamp of when the log event happened in the application, according to that application's clock.
+
+Furthermore, if ExtendedData (default false) is set to true (`<extendedData value="true" />`), these headers are set:
+
+ * `Headers["ClassName"]` - to the name of the class performing the logging
+ * `Headers["FileName"]` - to the name of the file where the logger resides
+ * `Headers["MethodName"]` - to the name of the method performing the logging
+ * `Headers["LineNumber"]` - to the line number of the code performing the logging
  
 ## Final Remarks
 

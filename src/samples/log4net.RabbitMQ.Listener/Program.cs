@@ -32,7 +32,14 @@ namespace log4net.RabbitMQ.Listener
 				m.BasicConsume(q, true, consumer);
 				
 				while (true)
-					Console.Write(((BasicDeliverEventArgs) consumer.Queue.Dequeue()).Body.AsUtf8String());
+				{
+					var msg = (BasicDeliverEventArgs) consumer.Queue.Dequeue();
+					
+					if (msg.BasicProperties.IsAppIdPresent())
+						Console.Write(msg.BasicProperties.AppId + " ");
+
+					Console.Write(msg.Body.AsUtf8String());
+				}
 			}
 		}
 	}
