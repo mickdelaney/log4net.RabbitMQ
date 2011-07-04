@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.IO;
 using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Framing.v0_9_1;
@@ -148,21 +149,16 @@ namespace log4net.RabbitMQ
 
 		private byte[] GetMessage(LoggingEvent loggingEvent)
 		{
-			string ex = loggingEvent.GetExceptionString();
-
-			var sb = new StringBuilder(loggingEvent.RenderedMessage,
-				loggingEvent.RenderedMessage.Length
-				+ (ex == null 
-					? 0 
-					: ex.Length + Environment.NewLine.Length));
-
-			if (ex != null)
+			var sb = new StringBuilder();
+			using (var sr = new StringWriter(sb))
 			{
-				sb.Append(Environment.NewLine);
-				sb.Append(ex);
-			}
+				Layout.Format(sr, loggingEvent);
 
-			return _Encoding.GetBytes(sb.ToString());
+				if (loggingEvent.ExceptionObject != null)
+					sr.Write(loggingEvent.GetExceptionString());
+
+				return _Encoding.GetBytes(sr.ToString());
+			}
 		}
 
 		#region StartUp and ShutDown
