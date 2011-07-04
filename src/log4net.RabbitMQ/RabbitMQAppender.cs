@@ -150,7 +150,7 @@ namespace log4net.RabbitMQ
 		{
 			string ex = loggingEvent.GetExceptionString();
 
-			var sb = new StringBuilder(loggingEvent.RenderedMessage, 
+			var sb = new StringBuilder(loggingEvent.RenderedMessage,
 				loggingEvent.RenderedMessage.Length
 				+ (ex == null 
 					? 0 

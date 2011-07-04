@@ -12,7 +12,7 @@ An appender for log4net. Configure it like this:
 </appender>
 ```
 
-Example config:
+Example log4net.config (configSections):
 
 ```xml
 <log4net>
@@ -37,3 +37,5 @@ LogManager.Shutdown();
 ```
 
 at `Application_End()`.
+
+See `samples\log4net.RabbitMQ.Web` for a complete example.
