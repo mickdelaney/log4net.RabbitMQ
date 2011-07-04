@@ -1,0 +1,13 @@
+F:\code\oss\log4net.RabbitMQ\src\log4net.RabbitMQAppender.Listener\bin\Release\log4net.RabbitMQAppender.Listener.exe
+F:\code\oss\log4net.RabbitMQ\src\log4net.RabbitMQAppender.Listener\bin\Release\log4net.RabbitMQAppender.Listener.pdb
+F:\code\oss\log4net.RabbitMQ\src\log4net.RabbitMQAppender.Listener\bin\Release\RabbitMQ.Client.dll
+F:\code\oss\log4net.RabbitMQ\src\log4net.RabbitMQAppender.Listener\bin\Release\RabbitMQ.Client.xml
+F:\code\oss\log4net.RabbitMQ\src\log4net.RabbitMQAppender.Listener\obj\x86\Release\ResolveAssemblyReference.cache
+F:\code\oss\log4net.RabbitMQ\src\log4net.RabbitMQAppender.Listener\obj\x86\Release\log4net.RabbitMQAppender.Listener.exe
+F:\code\oss\log4net.RabbitMQ\src\log4net.RabbitMQAppender.Listener\obj\x86\Release\log4net.RabbitMQAppender.Listener.pdb
+F:\code\oss\log4net.RabbitMQ\src\samples\log4net.RabbitMQAppender.Listener\bin\Release\log4net.RabbitMQAppender.Listener.exe
+F:\code\oss\log4net.RabbitMQ\src\samples\log4net.RabbitMQAppender.Listener\bin\Release\log4net.RabbitMQAppender.Listener.pdb
+F:\code\oss\log4net.RabbitMQ\src\samples\log4net.RabbitMQAppender.Listener\bin\Release\RabbitMQ.Client.xml
+F:\code\oss\log4net.RabbitMQ\src\samples\log4net.RabbitMQAppender.Listener\obj\x86\Release\ResolveAssemblyReference.cache
+F:\code\oss\log4net.RabbitMQ\src\samples\log4net.RabbitMQAppender.Listener\obj\x86\Release\log4net.RabbitMQAppender.Listener.exe
+F:\code\oss\log4net.RabbitMQ\src\samples\log4net.RabbitMQAppender.Listener\obj\x86\Release\log4net.RabbitMQAppender.Listener.pdb
