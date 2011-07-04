@@ -27,7 +27,7 @@ namespace log4net.RabbitMQAppender.Listener
 				m.BasicConsume(q, true, consumer);
 				
 				while (true)
-					Console.WriteLine(((BasicDeliverEventArgs) consumer.Queue.Dequeue()).Body.AsUtf8String());
+					Console.Write(((BasicDeliverEventArgs) consumer.Queue.Dequeue()).Body.AsUtf8String());
 			}
 		}
 	}
