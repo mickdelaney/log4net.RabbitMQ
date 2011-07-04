@@ -27,3 +27,13 @@ Example config:
 	</root>
 </log4net>
 ```
+
+## Note
+
+If using it in an ASP.Net application, remember to run
+
+```csharp
+LogManager.Shutdown();
+```
+
+at `Application_End()`.

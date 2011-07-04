@@ -16,6 +16,8 @@ namespace log4net.RabbitMQ
 		private readonly Encoding _Encoding = Encoding.UTF8;
 		private readonly DateTime _Epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 
+		#region Properties
+
 		private string _VHost = "/";
 
 		public string VHost
@@ -115,83 +117,33 @@ namespace log4net.RabbitMQ
 			set { if (value != null) _Exchange = value; }
 		}
 
-		protected override void OnClose()
-		{
-			base.OnClose();
-
-			try
-			{
-				if (_Connection != null)
-					_Connection.AutoClose = true;
-
-				if (_Model != null)
-				{
-					_Model.Close(Constants.ReplySuccess, "closing rabbitmq appender, shutting down logging");
-					_Model.Dispose();
-				}
-			}
-			catch (Exception e)
-			{
-				ErrorHandler.Error("could not close model", e);
-			}
-		}
-
-		public override void ActivateOptions()
-		{
-			base.ActivateOptions();
-
-			try
-			{
-				_Connection = GetConnectionFac().CreateConnection();
-			}
-			catch (Exception e)
-			{
-				ErrorHandler.Error("Could not connect to Rabbit instance", e);
-			}
-
-			try
-			{
-				_Model = _Connection.CreateModel();
-			}
-			catch (Exception e)
-			{
-				ErrorHandler.Error("Could not create model", e);
-			}
-
-			if (_Model != null)
-				_Model.ExchangeDeclare(_Exchange, ExchangeType.Topic);
-		}
-
-		private ConnectionFactory GetConnectionFac()
-		{
-			return new ConnectionFactory
-			       	{
-			       		HostName = HostName,
-			       		VirtualHost = VHost,
-			       		UserName = UserName,
-			       		Password = Password,
-			       		RequestedHeartbeat = 60
-			       	};
-		}
+		#endregion
 
 		protected override void Append(LoggingEvent loggingEvent)
 		{
-			if (_Model != null)
+			try
 			{
-				var basicProperties = _Model.CreateBasicProperties();
-				basicProperties.ContentEncoding = "utf8";
-				basicProperties.ContentType = "text/plain";
-				basicProperties.AppId = loggingEvent.Domain;
-				basicProperties.Timestamp = new AmqpTimestamp(
-					Convert.ToInt64((loggingEvent.TimeStamp - _Epoch).TotalSeconds));
-
-				var message = GetMessage(loggingEvent);
-				_Model.BasicPublish(_Exchange,
-				                    string.Format(_Topic, loggingEvent.Level.Name),
-				                    true, false, basicProperties,
-				                    message
-					);
+				if (_Model == null)
+					StartConnection();
 			}
+			catch (Exception e)
+			{
+				ErrorHandler.Error("Could not start connection", e);
+			}
+
+			var basicProperties = _Model.CreateBasicProperties();
+			basicProperties.ContentEncoding = "utf8";
+			basicProperties.ContentType = "text/plain";
+			basicProperties.AppId = loggingEvent.Domain;
+			basicProperties.Timestamp = new AmqpTimestamp(
+				Convert.ToInt64((loggingEvent.TimeStamp - _Epoch).TotalSeconds));
+
+			var message = GetMessage(loggingEvent);
+			_Model.BasicPublish(_Exchange,
+			                    string.Format(_Topic, loggingEvent.Level.Name),
+			                    true, false, basicProperties,
+			                    message
+				);
 		}
 
 		private byte[] GetMessage(LoggingEvent loggingEvent)
@@ -212,5 +164,83 @@ namespace log4net.RabbitMQ
 
 			return _Encoding.GetBytes(sb.ToString());
 		}
+
+		#region StartUp and ShutDown
+
+		protected override void OnClose()
+		{
+			base.OnClose();
+
+			ShutdownAmqp(_Connection,
+						 new ShutdownEventArgs(ShutdownInitiator.Application, Constants.ReplySuccess, "closing appender"));
+		}
+
+		private void ShutdownAmqp(IConnection connection, ShutdownEventArgs reason)
+		{
+			try
+			{
+				if (connection != null)
+				{
+					connection.ConnectionShutdown -= ShutdownAmqp;
+					connection.AutoClose = true;
+				}
+
+				if (_Model != null)
+				{
+					_Model.Close(Constants.ReplySuccess, "closing rabbitmq appender, shutting down logging");
+					_Model.Dispose();
+				}
+			}
+			catch (Exception e)
+			{
+				ErrorHandler.Error("could not close model", e);
+			}
+
+			_Connection = null;
+			_Model = null;
+		}
+
+		public override void ActivateOptions()
+		{
+			base.ActivateOptions();
+			StartConnection();
+		}
+
+		private void StartConnection()
+		{
+			try
+			{
+				_Connection = GetConnectionFac().CreateConnection();
+				_Connection.ConnectionShutdown += ShutdownAmqp;
+
+				try { _Model = _Connection.CreateModel(); }
+				catch (Exception e)
+				{
+					ErrorHandler.Error("could not create model", e);
+				}
+			}
+			catch (Exception e)
+			{
+				ErrorHandler.Error("could not connect to Rabbit instance", e);
+			}
+
+			if (_Model != null)
+				_Model.ExchangeDeclare(_Exchange, ExchangeType.Topic);
+		}
+
+		private ConnectionFactory GetConnectionFac()
+		{
+			return new ConnectionFactory
+			{
+				HostName = HostName,
+				VirtualHost = VHost,
+				UserName = UserName,
+				Password = Password,
+				RequestedHeartbeat = 60
+			};
+		}
+
+		#endregion
+
 	}
 }

@@ -22,8 +22,10 @@ namespace log4net.RabbitMQAppender.Listener
 			{
 				var consumer = new QueueingBasicConsumer(m);
 				var q = m.QueueDeclare("", false, true, true, null);
+
 				m.QueueBind(q, "log4net-logging", "#");
 				m.BasicConsume(q, true, consumer);
+				
 				while (true)
 					Console.WriteLine(((BasicDeliverEventArgs) consumer.Queue.Dequeue()).Body.AsUtf8String());
 			}
