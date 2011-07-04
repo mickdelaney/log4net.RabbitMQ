@@ -6,10 +6,10 @@ An appender for logging over AMQP, specifically RabbitMQ. Why? Because sometimes
 
 Appender properties:
 
- * **VHost** - the virtual host to use. This needs to be configured in RabbitMQ before put to use.
- * **UserName** - the username to authenticate with.
- * **Password** - the password to authenticate with.
- * **Port** - what port the RabbitMQ broker is listening to.
+ * **VHost** - the virtual host to use. This needs to be configured in RabbitMQ before put to use. Defaults to `/`.
+ * **UserName** - the username to authenticate with. Defaults to `guest`.
+ * **Password** - the password to authenticate with. Defaults to `guest`.
+ * **Port** - what port the RabbitMQ broker is listening to. Defaults to `5672`.
  * **Topic** - what topic to publish with. It must contain a string: `{0}`, or the logger won't work. The string inserted here will be used together with `string.Format`.
  * **Protocol** - of type IProtocol - what protocol to use for RabbitMQ-communication. See also `SetProtocol`.
  * **HostName** - the host name of the computer/node to connect to. Defaults to `localhost`.
