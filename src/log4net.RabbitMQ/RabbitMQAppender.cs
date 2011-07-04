@@ -9,6 +9,9 @@ using log4net.Core;
 
 namespace log4net.RabbitMQ
 {
+	/// <summary>
+	/// An appender for log4net that publishes to RabbitMQ.
+	/// </summary>
 	public class RabbitMQAppender : AppenderSkeleton
 	{
 		private string _Exchange = "log4net-logging";
@@ -21,6 +24,9 @@ namespace log4net.RabbitMQ
 
 		private string _VHost = "/";
 
+		/// <summary>
+		/// Gets or sets the virtual host to publish to.
+		/// </summary>
 		public string VHost
 		{
 			get { return _VHost; }
@@ -29,6 +35,11 @@ namespace log4net.RabbitMQ
 
 		private string _UserName = "guest";
 
+		/// <summary>
+		/// Gets or sets the username to use for
+		/// authentication with the message broker. The default
+		/// is 'guest'
+		/// </summary>
 		public string UserName
 		{
 			get { return _UserName; }
@@ -37,6 +48,11 @@ namespace log4net.RabbitMQ
 
 		private string _Password = "guest";
 
+		/// <summary>
+		/// Gets or sets the password to use for
+		/// authentication with the message broker.
+		/// The default is 'guest'
+		/// </summary>
 		public string Password
 		{
 			get { return _Password; }
@@ -45,6 +61,12 @@ namespace log4net.RabbitMQ
 
 		private uint _Port = 5672;
 
+		/// <summary>
+		/// Gets or sets the port to use
+		/// for connections to the message broker (this is the broker's
+		/// listening port).
+		/// The default is '5672'.
+		/// </summary>
 		public uint Port
 		{
 			get { return _Port; }
@@ -56,7 +78,8 @@ namespace log4net.RabbitMQ
 		/// <summary>
 		/// 	Gets or sets the routing key (aka. topic) with which
 		/// 	to send messages. Defaults to {0}, which in the end is 'error' for log.Error("..."), and
-		/// 	so on. An example could be setting this property to 'ApplicationType.MyApp.Web.{0}'
+		/// 	so on. An example could be setting this property to 'ApplicationType.MyApp.Web.{0}'.
+		///		The default is '{0}'.
 		/// </summary>
 		public string Topic
 		{
@@ -66,6 +89,11 @@ namespace log4net.RabbitMQ
 
 		private IProtocol _Protocol = Protocols.DefaultProtocol;
 
+		/// <summary>
+		/// Gets or sets the AMQP protocol (version) to use
+		/// for communications with the RabbitMQ broker. The default 
+		/// is the RabbitMQ.Client-library's default protocol.
+		/// </summary>
 		public IProtocol Protocol
 		{
 			get { return _Protocol; }
@@ -74,7 +102,9 @@ namespace log4net.RabbitMQ
 
 		/// <summary>
 		/// 	Sets the protocol from a string.
-		/// 	Uses <see cref = "Protocols.Lookup" /> internally.
+		/// 	Uses <see cref = "Protocols.Lookup" /> internally. It is
+		///		safe to pass both null and invalid protocols to this method (but
+		///		don't expect those invalid protocols to be used ;))
 		/// </summary>
 		/// <param name = "protocol"></param>
 		public void SetProtocol(string protocol)
@@ -143,8 +173,7 @@ namespace log4net.RabbitMQ
 			_Model.BasicPublish(_Exchange,
 			                    string.Format(_Topic, loggingEvent.Level.Name),
 			                    true, false, basicProperties,
-			                    message
-				);
+			                    message);
 		}
 
 		private byte[] GetMessage(LoggingEvent loggingEvent)
@@ -162,39 +191,6 @@ namespace log4net.RabbitMQ
 		}
 
 		#region StartUp and ShutDown
-
-		protected override void OnClose()
-		{
-			base.OnClose();
-
-			ShutdownAmqp(_Connection,
-						 new ShutdownEventArgs(ShutdownInitiator.Application, Constants.ReplySuccess, "closing appender"));
-		}
-
-		private void ShutdownAmqp(IConnection connection, ShutdownEventArgs reason)
-		{
-			try
-			{
-				if (connection != null)
-				{
-					connection.ConnectionShutdown -= ShutdownAmqp;
-					connection.AutoClose = true;
-				}
-
-				if (_Model != null)
-				{
-					_Model.Close(Constants.ReplySuccess, "closing rabbitmq appender, shutting down logging");
-					_Model.Dispose();
-				}
-			}
-			catch (Exception e)
-			{
-				ErrorHandler.Error("could not close model", e);
-			}
-
-			_Connection = null;
-			_Model = null;
-		}
 
 		public override void ActivateOptions()
 		{
@@ -232,11 +228,44 @@ namespace log4net.RabbitMQ
 				VirtualHost = VHost,
 				UserName = UserName,
 				Password = Password,
-				RequestedHeartbeat = 60
+				RequestedHeartbeat = 60,
+				Port = (int)Port
 			};
 		}
 
-		#endregion
+		protected override void OnClose()
+		{
+			base.OnClose();
 
+			ShutdownAmqp(_Connection,
+			             new ShutdownEventArgs(ShutdownInitiator.Application, Constants.ReplySuccess, "closing appender"));
+		}
+
+		private void ShutdownAmqp(IConnection connection, ShutdownEventArgs reason)
+		{
+			try
+			{
+				if (connection != null)
+				{
+					connection.ConnectionShutdown -= ShutdownAmqp;
+					connection.AutoClose = true;
+				}
+
+				if (_Model != null)
+				{
+					_Model.Close(Constants.ReplySuccess, "closing rabbitmq appender, shutting down logging");
+					_Model.Dispose();
+				}
+			}
+			catch (Exception e)
+			{
+				ErrorHandler.Error("could not close model", e);
+			}
+
+			_Connection = null;
+			_Model = null;
+		}
+
+		#endregion
 	}
 }

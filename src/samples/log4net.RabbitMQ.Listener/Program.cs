@@ -3,7 +3,7 @@ using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace log4net.RabbitMQAppender.Listener
+namespace log4net.RabbitMQ.Listener
 {
 	internal class Program
 	{
