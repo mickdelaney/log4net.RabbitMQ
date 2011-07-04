@@ -3,8 +3,8 @@
 *ReSharper.user
 _ReSharper*
 
-src/**/obj
-src/**/bin
+bin/
+obj/
 
 *.suo
 *.cache
