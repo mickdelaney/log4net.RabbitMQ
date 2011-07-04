@@ -12,7 +12,7 @@ Appender properties:
  * **Port** - what port the RabbitMQ broker is listening to.
  * **Topic** - what topic to publish with. It must contain a string: `{0}`, or the logger won't work. The string inserted here will be used together with `string.Format`.
  * **Protocol** - of type IProtocol - what protocol to use for RabbitMQ-communication. See also `SetProtocol`.
- * **HostName** - the host name of the computer/node to connect to.
+ * **HostName** - the host name of the computer/node to connect to. Defaults to `localhost`.
  * **Exchange** - what exchange to publish log messages to. Defaults to `log4net-logging` and is declared when the appender is started.
 
 ## Example log4net.config
@@ -91,7 +91,7 @@ It should be noted that the message's IBasicProperties' following properties are
  * **ContentEncoding** - to "utf8"
  * **ContentType** - to "text/plain"
  * **AppId** - to `loggingEvent.Domain`
- * **Timestamp** - to `new AmqpTimestamp(Convert.ToInt64((loggingEvent.TimeStamp - _Epoch).TotalSeconds))` where _Epoch is 1/1/1970 at 00:00. Hence, it's the unix timestamp.
+ * **Timestamp** - to `new AmqpTimestamp(Convert.ToInt64((loggingEvent.TimeStamp - _Epoch).TotalSeconds))` where _Epoch is 1/1/1970 at 00:00. Hence, it's the unix timestamp of when the log event happened in the application, according to that application's clock.
  
 ## Final Remarks
 
