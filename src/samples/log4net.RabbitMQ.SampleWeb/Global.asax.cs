@@ -49,7 +49,7 @@ namespace log4net.RabbitMQ.SampleWeb
 		{
 			_Logger.Info("shutting down application");
 
-			//LogManager.Shutdown();
+			LogManager.Shutdown();
 		}
 	}
 }
