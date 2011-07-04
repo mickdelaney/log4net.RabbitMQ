@@ -49,3 +49,55 @@ LogManager.Shutdown();
 ```
 
 If you put the log4net configuration in web.config, reloading and restarting the AMQP channel won't work after an AppDomain recycle or change to the web.config file.
+
+## From the receiving side
+
+For full documentation, see the RabbitMQ web site. An example receiver has this main method:
+
+```csharp
+private static void Main(string[] args)
+{
+	var factory = new ConnectionFactory
+	{
+		HostName = "localhost",
+		UserName = "guest",
+		Password = "guest",
+		Protocol = Protocols.DefaultProtocol
+	};
+
+	using (var c = factory.CreateConnection())
+	using (var m = c.CreateModel())
+	{
+		var consumer = new QueueingBasicConsumer(m);
+		var q = m.QueueDeclare("", false, true, true, null);
+
+		m.QueueBind(q, "log4net-logging", "#");
+		m.BasicConsume(q, true, consumer);
+				
+		while (true)
+			Console.Write(((BasicDeliverEventArgs) consumer.Queue.Dequeue()).Body.AsUtf8String());
+	}
+}
+// ...
+static class Extensions {
+	public static string AsUtf8String(this byte[] args) {
+		return Encoding.UTF8.GetString(args);
+	}
+}
+```
+
+It should be noted that the message's IBasicProperties' following properties are also set:
+
+ * **ContentEncoding** - to "utf8"
+ * **ContentType** - to "text/plain"
+ * **AppId** - to `loggingEvent.Domain`
+ * **Timestamp** - to `new AmqpTimestamp(Convert.ToInt64((loggingEvent.TimeStamp - _Epoch).TotalSeconds))` where _Epoch is 1/1/1970 at 00:00. Hence, it's the unix timestamp.
+ 
+## Final Remarks
+
+Report issues at this repository's **Issues** page.
+ 
+E-mail feedback to henrik at haf dot se or send me a pm over github.
+
+Cheers,
+Henrik Feldt

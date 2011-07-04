@@ -32,10 +32,8 @@ namespace log4net.RabbitMQ.Listener
 		}
 	}
 
-	static class Extensions
-	{
-		public static string AsUtf8String(this byte[] args)
-		{
+	static class Extensions {
+		public static string AsUtf8String(this byte[] args) {
 			return Encoding.UTF8.GetString(args);
 		}
 	}
