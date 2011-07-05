@@ -1,10 +1,6 @@
-
-*.csproj.user
-*ReSharper.user
-_ReSharper*
-
 bin/
 obj/
-
+*.user
+_ReSharper*
+*.resharper
 *.suo
-*.cache
